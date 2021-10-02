@@ -1,3 +1,5 @@
-FROM local/devops/jenkins-master-base-2.303.1:latest
+ARG JENKINS_VERSION
+
+FROM local/devops/jenkins-master-base-${JENKINS_VERSION}:latest
 
 
