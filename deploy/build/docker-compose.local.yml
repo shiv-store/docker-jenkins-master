@@ -1,0 +1,42 @@
+jenkins:
+  image: local/devops/jenkins-master-build:20211002-121957
+  hostname: build.dev.shivaanta.com
+  ports: 
+    - "3010:3010"
+    - "4000:4000"
+  volumes_from:
+    - plugins
+    - config
+
+tls:
+  image: local/devops/nginx-dot-internal-tls:20211002-094159
+  command: /bin/echo
+  volumes:
+    - /etc/nginx/ssl
+
+nginx:
+  image: nginx:1.21.3-alpine
+  ports:
+    - "2010:2010"
+    - "80:80"
+    - "443:443"
+  volumes_from: 
+    - jenkins
+    - tls
+  links:
+    - jenkins:jenkins-master
+
+plugins:
+  image: local/devops/jenkins-master-dev-plugins:20211002-075043
+  command: /bin/echo
+  volumes: 
+    - /dist/jenkins/plugins
+
+config:
+  image: local/devops/jenkins-master-build-config-dev:20211002-114548
+  command: /bin/echo
+  volumes:
+    - /etc/log-parser
+    - /etc/nginx/conf.d
+    - /dist/jenkins/config
+    - /dist/jenkins/jobs
